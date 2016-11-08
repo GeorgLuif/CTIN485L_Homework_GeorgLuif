@@ -6,7 +6,7 @@ public class SetupLocalPlayer : NetworkBehaviour
 {
 	[SyncVar]
 	public string playerName = "unnamed";
-
+    public Camera camera;
 	TextMesh nameMesh;
 
 	void OnGUI()
@@ -25,8 +25,14 @@ public class SetupLocalPlayer : NetworkBehaviour
 
 	void Start()
 	{
-		if (isLocalPlayer)
+        camera.enabled = false;
+
+        if (isLocalPlayer)
+        {
+            camera.enabled = true;
 			GetComponent<PlayerMotor>().enabled = true;
+
+        }
 
 		nameMesh = GetComponentInChildren<TextMesh>();
 	}
