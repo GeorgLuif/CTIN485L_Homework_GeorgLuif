@@ -2,6 +2,8 @@
 using System.Collections;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using System;
+
 public class Player : NetworkBehaviour
 {
 	[SyncVar(hook = "OnChangeHealth")]
@@ -9,49 +11,99 @@ public class Player : NetworkBehaviour
 
 
 	private int maxHealth = 5;
-	[SyncVar]
+	[SyncVar(hook = "OnChangeAlive")]
 	public bool alive = true;
+	[SyncVar(hook = "OnChangeKD")]
+	private int deaths = 0;
+	[SyncVar(hook = "OnChangeKD")]
+	public int kills = 0;
 
 	public Image healthBar;
+	public Text kdText;
+	private PlayerMotor m;
 
 	private PlayerAnimations pAnim;
 
 	void Start()
 	{
 		pAnim = GetComponent<PlayerAnimations>();
+		m = GetComponent<PlayerMotor>();
 	}
 
 
 	public void TakeDamage()
 	{
-		if (!isServer)
-			return;
-
 		health--;
 		Debug.Log("<color=red>Player took damage</color>");
-		
-
-		if(health <= 0 && alive)
-		{
-			alive = false;
-			RpcDie();
-		}
 
 	}
 
-
-	[ClientRpc]
-	void RpcDie()
+	void Die()
 	{
-		if (!isLocalPlayer)
-			return;
-
-		Debug.Log("<color=black>Player DIED</color>");
 		pAnim.DeathAnimation();
+	}
+
+	void OnChangeAlive(bool yesno) {
+		deaths++;
+		Player[] players = FindObjectsOfType<Player>();
+		
+
+		for (int i = 0; i < players.Length; i++)
+		{
+			if (players[i] != this)
+				players[i].kills++;
+
+		}
+
+		OnChangeKD(0);
+	}
+
+	private void OnChangeKD(int i)
+	{
+		kdText.text = "Kills: " + kills + "\nDeaths: " + deaths;
+
+		
+
 	}
 
 	void OnChangeHealth(int health)
 	{
 		healthBar.fillAmount = (float)((float)Mathf.Clamp(health, 0, maxHealth) / (float)maxHealth);
+		if (health <= 0 && alive)
+		{
+			alive = false;
+			Die();
+
+			m.Disable();
+
+			
+			GetComponent<Collider>().enabled = false;
+
+			Respawn();
+
+			Debug.Log("<color=red>Player is DEAD</color>");
+		}
+	}
+
+	void Respawn()
+	{
+
+		StartCoroutine(RespawnCoroutine());
+
+	}
+
+	private IEnumerator RespawnCoroutine()
+	{
+		yield return new WaitForSeconds(2f);
+		
+		GetComponent<Collider>().enabled = true;
+		pAnim.RespawnAnimation();
+		this.health = maxHealth;
+		alive = true;
+
+		NetworkStartPosition[] spawnPoints = GameObject.FindObjectsOfType<NetworkStartPosition>();
+
+		transform.position = spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Length)].transform.position;
+	
 	}
 }

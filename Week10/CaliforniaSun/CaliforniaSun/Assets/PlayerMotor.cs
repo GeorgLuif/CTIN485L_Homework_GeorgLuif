@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.Networking;
+using System;
 
 public class PlayerMotor : MonoBehaviour {
 
@@ -8,6 +9,8 @@ public class PlayerMotor : MonoBehaviour {
 
 	Vector3 movement;
     CharacterController c;
+
+	bool disabled = false;
 
     void Start()
     {
@@ -17,6 +20,10 @@ public class PlayerMotor : MonoBehaviour {
 	float jumpPower = 0f;
 
 	void Update () {
+
+		if(disabled)
+			return;
+		
 
 		movement = new Vector3(Input.GetAxis("Horizontal"), Physics.gravity.y + jumpPower, Input.GetAxis("Vertical"));
 		
@@ -28,5 +35,17 @@ public class PlayerMotor : MonoBehaviour {
 
         c.Move(transform.TransformDirection(movement) * Time.deltaTime * speed);
         
+	}
+
+	public void Disable() {
+	if(!disabled)
+		StartCoroutine(DisableCoroutine());
+	}
+
+	private IEnumerator DisableCoroutine()
+	{
+		disabled = true;
+		yield return new WaitForSeconds(2f);
+		disabled = false;
 	}
 }
