@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using System;
+using UnityEngine.SceneManagement;
 
 public class Player : NetworkBehaviour
 {
@@ -23,6 +24,10 @@ public class Player : NetworkBehaviour
 	private PlayerMotor m;
 
 	private PlayerAnimations pAnim;
+	public int winKills = 5;
+
+	private float cooldownTimer = -1f;
+	private float cooldown = 1f;
 
 	void Start()
 	{
@@ -43,26 +48,47 @@ public class Player : NetworkBehaviour
 		pAnim.DeathAnimation();
 	}
 
+	void Update() {
+		if (cooldownTimer > 0)
+			cooldownTimer -= Time.deltaTime;
+	}
+
 	void OnChangeAlive(bool yesno) {
-		deaths++;
-		Player[] players = FindObjectsOfType<Player>();
+	
 		
+
+		cooldownTimer = cooldown;
+
+		Debug.Log("On change alive is called..");
+		
+		Player[] players = FindObjectsOfType<Player>();
 
 		for (int i = 0; i < players.Length; i++)
 		{
-			if (players[i] != this)
-				players[i].kills++;
+
+			if (players[i] == this && isLocalPlayer)
+				deaths++;
 
 		}
-
 		OnChangeKD(0);
+
 	}
 
 	private void OnChangeKD(int i)
 	{
-		kdText.text = "Kills: " + kills + "\nDeaths: " + deaths;
+		kdText.text =  "Deaths: " + deaths;
 
-		
+		if (kills >= winKills) {
+			FindObjectOfType<Prototype.NetworkLobby.LobbyManager>().ServerChangeScene("WinScene");
+			SceneManager.LoadScene("WinScene");
+		}
+
+		if (deaths >= winKills)
+		{
+			FindObjectOfType<Prototype.NetworkLobby.LobbyManager>().ServerChangeScene("LoseScene");
+			SceneManager.LoadScene("LoseScene");
+		}
+
 
 	}
 

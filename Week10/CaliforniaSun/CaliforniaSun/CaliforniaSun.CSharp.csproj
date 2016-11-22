@@ -89,6 +89,7 @@
     <Compile Include="Assets\Player_Gun.cs" />
     <Compile Include="Assets\SetupLocalPlayer.cs" />
     <Compile Include="Assets\WhatsMyIP.cs" />
+    <Compile Include="Assets\WinSceneManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Cinema Suite\About\Editor\Resources\BaseProductInfo.xml" />
