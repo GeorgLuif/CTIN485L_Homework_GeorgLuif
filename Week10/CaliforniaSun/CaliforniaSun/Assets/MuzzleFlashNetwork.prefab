@@ -248,7 +248,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TransformSyncMode: 1
-  m_SendInterval: 1
+  m_SendInterval: 0.04
   m_SyncRotationAxis: 7
   m_RotationSyncCompression: 0
   m_SyncSpin: 0
@@ -727,18 +727,18 @@ ParticleSystem:
         m_RotationOrder: 4
       minMaxState: 0
     cnt0: 5
-    cnt1: 30
+    cnt1: 4
     cnt2: 30
     cnt3: 30
     cntmax0: 8
-    cntmax1: 30
+    cntmax1: 12
     cntmax2: 30
     cntmax3: 30
     time0: 0
-    time1: 0
+    time1: 0.3
     time2: 0
     time3: 0
-    m_BurstCount: 1
+    m_BurstCount: 2
   SizeModule:
     enabled: 1
     curve:
